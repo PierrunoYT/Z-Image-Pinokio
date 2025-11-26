@@ -3,14 +3,6 @@ import gradio as gr
 from PIL import Image
 import numpy as np
 
-# Import ZImagePipeline - it's a custom pipeline in modelscope
-try:
-    from modelscope.pipelines import pipeline as modelscope_pipeline
-    MODELSCOPE_AVAILABLE = True
-except ImportError:
-    MODELSCOPE_AVAILABLE = False
-    print("Warning: modelscope not available")
-
 # Global variable to store the pipeline
 pipe = None
 
@@ -20,19 +12,15 @@ def load_model():
     if pipe is None:
         print("Loading Z-Image-Turbo model...")
         
-        # Use ModelScope pipeline for Z-Image-Turbo
-        from modelscope import snapshot_download
         from diffusers import DiffusionPipeline
         
-        # Download model from ModelScope
-        model_dir = snapshot_download('Tongyi-MAI/Z-Image-Turbo', revision='master')
-        
-        # Load with diffusers
+        # Load directly from Hugging Face Hub
+        # Z-Image-Turbo is available on HF with custom pipeline code
         pipe = DiffusionPipeline.from_pretrained(
-            model_dir,
+            "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=False,
             trust_remote_code=True,
+            use_safetensors=True,
         )
         pipe.to("cuda")
         
