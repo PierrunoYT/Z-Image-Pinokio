@@ -32,28 +32,15 @@ def load_model():
         print("=" * 60)
         
         # Use bfloat16 for optimal performance on supported GPUs
-        # trust_remote_code=True allows loading the custom ZImagePipeline from the model repo
-        from huggingface_hub import hf_hub_download
-        import importlib.util
+        # Load the custom ZImagePipeline from the model repository
+        from diffusers import DiffusionPipeline
         
-        # First, download and import the custom pipeline module
-        print("📥 Downloading custom pipeline code...")
-        pipeline_file = hf_hub_download(
-            repo_id="Tongyi-MAI/Z-Image-Turbo",
-            filename="pipeline_zimage.py",
-        )
-        
-        # Import the custom pipeline
-        spec = importlib.util.spec_from_file_location("pipeline_zimage", pipeline_file)
-        pipeline_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(pipeline_module)
-        ZImagePipeline = pipeline_module.ZImagePipeline
-        
-        print("📥 Loading model weights...")
-        pipe = ZImagePipeline.from_pretrained(
+        print("📥 Loading model (this will download ~12GB on first run)...")
+        pipe = DiffusionPipeline.from_pretrained(
             "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=False,
+            trust_remote_code=True,
+            custom_pipeline="Tongyi-MAI/Z-Image-Turbo",
         )
         
         print("=" * 60)
