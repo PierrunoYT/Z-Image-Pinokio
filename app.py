@@ -2,7 +2,7 @@ import torch
 import gradio as gr
 from PIL import Image
 import numpy as np
-from diffusers import ZImagePipeline
+from diffusers import DiffusionPipeline
 
 # Global variable to store the pipeline
 pipe = None
@@ -20,10 +20,12 @@ def load_model():
         print("=" * 60)
         
         # Use bfloat16 for optimal performance on supported GPUs
-        pipe = ZImagePipeline.from_pretrained(
+        # trust_remote_code=True allows loading the custom ZImagePipeline from the model repo
+        pipe = DiffusionPipeline.from_pretrained(
             "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
             low_cpu_mem_usage=False,
+            trust_remote_code=True,  # Required for custom Z-Image pipeline
         )
         
         print("=" * 60)
