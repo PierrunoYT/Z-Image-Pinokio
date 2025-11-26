@@ -10,6 +10,16 @@ module.exports = {
         ],
       }
     },
+    // Install diffusers from source (required for ZImagePipeline)
+    {
+      method: "shell.run",
+      params: {
+        venv: "env",
+        message: [
+          "pip install git+https://github.com/huggingface/diffusers"
+        ],
+      }
+    },
     // Install PyTorch with CUDA support and xformers
     {
       method: "script.start",
