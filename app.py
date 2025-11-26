@@ -2,13 +2,19 @@ import torch
 import gradio as gr
 from PIL import Image
 import numpy as np
-from diffusers import DiffusionPipeline
 import sys
 import io
+import os
 
 # Fix Windows console encoding for emojis
 if sys.platform == 'win32':
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    except:
+        pass
+
+# Set environment variable to trust remote code
+os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 
 # Global variable to store the pipeline
 pipe = None
@@ -27,11 +33,27 @@ def load_model():
         
         # Use bfloat16 for optimal performance on supported GPUs
         # trust_remote_code=True allows loading the custom ZImagePipeline from the model repo
-        pipe = DiffusionPipeline.from_pretrained(
+        from huggingface_hub import hf_hub_download
+        import importlib.util
+        
+        # First, download and import the custom pipeline module
+        print("📥 Downloading custom pipeline code...")
+        pipeline_file = hf_hub_download(
+            repo_id="Tongyi-MAI/Z-Image-Turbo",
+            filename="pipeline_zimage.py",
+        )
+        
+        # Import the custom pipeline
+        spec = importlib.util.spec_from_file_location("pipeline_zimage", pipeline_file)
+        pipeline_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(pipeline_module)
+        ZImagePipeline = pipeline_module.ZImagePipeline
+        
+        print("📥 Loading model weights...")
+        pipe = ZImagePipeline.from_pretrained(
             "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
             low_cpu_mem_usage=False,
-            trust_remote_code=True,  # Required for custom Z-Image pipeline
         )
         
         print("=" * 60)
