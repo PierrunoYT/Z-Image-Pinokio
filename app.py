@@ -25,13 +25,39 @@ def load_model():
         print("This may take a few minutes on first launch...")
         print("=" * 60)
         
-        from diffusers import DiffusionPipeline
+        from huggingface_hub import snapshot_download, hf_hub_download
+        import importlib.util
+        import sys
         
-        # Load the model with custom pipeline from the model repo
-        pipe = DiffusionPipeline.from_pretrained(
-            "Tongyi-MAI/Z-Image-Turbo",
+        # Download the custom pipeline file
+        print("Downloading custom pipeline code...")
+        pipeline_file = hf_hub_download(
+            repo_id="Tongyi-MAI/Z-Image-Turbo",
+            filename="pipeline_zimage.py",
+        )
+        
+        # Download model files
+        print("Downloading model files (this may take a while)...")
+        model_path = snapshot_download(
+            repo_id="Tongyi-MAI/Z-Image-Turbo",
+            ignore_patterns=["*.md", "*.txt"],
+        )
+        
+        # Load the custom pipeline module
+        print("Loading custom pipeline...")
+        spec = importlib.util.spec_from_file_location("pipeline_zimage", pipeline_file)
+        pipeline_module = importlib.util.module_from_spec(spec)
+        sys.modules["pipeline_zimage"] = pipeline_module
+        spec.loader.exec_module(pipeline_module)
+        
+        # Get the ZImagePipeline class
+        ZImagePipeline = pipeline_module.ZImagePipeline
+        
+        # Load the model
+        print("Loading model weights...")
+        pipe = ZImagePipeline.from_pretrained(
+            model_path,
             torch_dtype=torch.bfloat16,
-            trust_remote_code=True,
         )
         pipe.to("cuda")
         
