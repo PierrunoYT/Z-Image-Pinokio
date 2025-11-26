@@ -156,7 +156,7 @@ example_prompts = [
 ]
 
 # Create Gradio interface
-with gr.Blocks(title="Z-Image-Turbo Generator", theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="Z-Image-Turbo Generator") as demo:
     gr.Markdown(
         """
         # ⚡️ Z-Image-Turbo Image Generator

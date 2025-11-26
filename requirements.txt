@@ -1,29 +1,29 @@
 # Z-Image-Turbo Gradio UI Requirements
 
 # Core dependencies
-gradio>=4.0.0
-pillow>=9.0.0
-numpy>=1.24.0
+gradio
+pillow
+numpy<2.0.0
+opencv-python-headless
 
 # ModelScope and required packages
-modelscope>=1.9.0
-transformers>=4.35.0
-diffusers>=0.24.0
-peft>=0.7.0
-accelerate>=0.25.0
-safetensors>=0.4.0
+modelscope
+transformers
+diffusers
+peft
+accelerate
+safetensors
 
 # Additional utilities
-tqdm>=4.65.0
-omegaconf>=2.3.0
-einops>=0.7.0
+tqdm
+omegaconf
+einops
 
 # Performance optimizations (installed separately in install.js)
 # - xformers: Installed via torch.js with xformers flag enabled
 # - flash-attn: Installed separately with --no-build-isolation flag
 
 # PyTorch (installed separately via torch.js with CUDA support)
-# torch>=2.0.0
-# torchvision>=0.15.0
-# torchaudio>=0.15.0
-
+# torch
+# torchvision
+# torchaudio
