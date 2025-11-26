@@ -3,6 +3,12 @@ import gradio as gr
 from PIL import Image
 import numpy as np
 from diffusers import DiffusionPipeline
+import sys
+import io
+
+# Fix Windows console encoding for emojis
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Global variable to store the pipeline
 pipe = None
