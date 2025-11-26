@@ -11,7 +11,13 @@ def load_model():
     """Load the Z-Image-Turbo model"""
     global pipe
     if pipe is None:
-        print("Loading Z-Image-Turbo model...")
+        print("=" * 60)
+        print("🚀 Loading Z-Image-Turbo model...")
+        print("=" * 60)
+        print("📦 Model: Tongyi-MAI/Z-Image-Turbo (6B parameters)")
+        print("💾 Size: ~12GB (will download on first run)")
+        print("⏳ This may take a few minutes on first launch...")
+        print("=" * 60)
         
         # Use bfloat16 for optimal performance on supported GPUs
         pipe = ZImagePipeline.from_pretrained(
@@ -19,7 +25,13 @@ def load_model():
             torch_dtype=torch.bfloat16,
             low_cpu_mem_usage=False,
         )
+        
+        print("=" * 60)
+        print("✅ Model loaded successfully!")
+        print("🔄 Moving model to CUDA...")
         pipe.to("cuda")
+        print("✅ Model ready on GPU!")
+        print("=" * 60)
         
         # Enable Flash Attention for better efficiency (optional)
         try:
@@ -58,6 +70,7 @@ def generate_image(
     """Generate image using Z-Image-Turbo"""
     try:
         # Load model if not already loaded
+        print("\n" + "🔄 Initializing generation...")
         pipeline = load_model()
         
         # Handle seed
@@ -67,7 +80,12 @@ def generate_image(
         generator = torch.Generator("cuda").manual_seed(int(seed))
         
         # Generate image
-        print(f"Generating image with prompt: {prompt[:50]}...")
+        print(f"🎨 Generating image...")
+        print(f"   Prompt: {prompt[:80]}{'...' if len(prompt) > 80 else ''}")
+        print(f"   Resolution: {width}x{height}")
+        print(f"   Steps: {num_inference_steps} (= {num_inference_steps-1} DiT forwards)")
+        print(f"   Seed: {seed}")
+        
         image = pipeline(
             prompt=prompt,
             height=int(height),
@@ -77,11 +95,12 @@ def generate_image(
             generator=generator,
         ).images[0]
         
-        return image, f"Generated successfully! Seed: {seed}"
+        print("✅ Image generated successfully!\n")
+        return image, f"✅ Generated successfully!\n🎲 Seed: {seed}\n📐 Resolution: {width}x{height}\n⚡ Steps: {num_inference_steps}"
     
     except Exception as e:
-        error_msg = f"Error generating image: {str(e)}"
-        print(error_msg)
+        error_msg = f"❌ Error generating image: {str(e)}"
+        print(error_msg + "\n")
         # Return a blank image and error message
         blank_image = Image.new('RGB', (512, 512), color='gray')
         return blank_image, error_msg
@@ -312,8 +331,15 @@ with gr.Blocks(title="Z-Image-Turbo Generator") as demo:
 
 # Launch the app
 if __name__ == "__main__":
-    print("Starting Z-Image-Turbo Gradio UI...")
-    print("Loading model on first generation...")
+    print("\n" + "=" * 60)
+    print("🎨 Z-Image-Turbo Gradio UI")
+    print("=" * 60)
+    print("📍 Starting server...")
+    print("🌐 Server will be available at: http://localhost:7860")
+    print("=" * 60)
+    print("ℹ️  Note: Model will download (~12GB) on first image generation")
+    print("=" * 60 + "\n")
+    
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
