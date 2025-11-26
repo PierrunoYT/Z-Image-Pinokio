@@ -7,8 +7,7 @@ import torch
 import gradio as gr
 from PIL import Image
 import numpy as np
-import sys
-import os
+from diffusers import ZImagePipeline
 
 # Global variable to store the pipeline
 pipe = None
@@ -25,38 +24,11 @@ def load_model():
         print("This may take a few minutes on first launch...")
         print("=" * 60)
         
-        from modelscope import snapshot_download
-        import importlib.util
-        import sys
-        import os
-        
-        # Download model from ModelScope (includes custom pipeline)
-        print("Downloading model from ModelScope...")
-        model_path = snapshot_download(
-            'Tongyi-MAI/Z-Image-Turbo',
-            revision='master',
-        )
-        
-        # Find and load the custom pipeline module
-        print("Loading custom pipeline...")
-        pipeline_file = os.path.join(model_path, "pipeline_zimage.py")
-        
-        if not os.path.exists(pipeline_file):
-            raise FileNotFoundError(f"pipeline_zimage.py not found in {model_path}")
-        
-        spec = importlib.util.spec_from_file_location("pipeline_zimage", pipeline_file)
-        pipeline_module = importlib.util.module_from_spec(spec)
-        sys.modules["pipeline_zimage"] = pipeline_module
-        spec.loader.exec_module(pipeline_module)
-        
-        # Get the ZImagePipeline class
-        ZImagePipeline = pipeline_module.ZImagePipeline
-        
-        # Load the model
-        print("Loading model weights...")
+        # Use bfloat16 for optimal performance on supported GPUs
         pipe = ZImagePipeline.from_pretrained(
-            model_path,
+            "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=False,
         )
         pipe.to("cuda")
         
