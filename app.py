@@ -20,13 +20,18 @@ def load_model():
         )
         pipe.to("cuda")
         
-        # Enable Flash Attention for better efficiency
+        # Enable Flash Attention for better efficiency (optional)
         try:
+            # Check if flash-attn is installed
+            import flash_attn
             pipe.transformer.set_attention_backend("flash")
-            print("Flash Attention enabled successfully!")
+            print("✓ Flash Attention enabled successfully!")
+        except ImportError:
+            print("⚠ Flash Attention not installed, using default SDPA attention")
+            print("  (This is fine - the model will still work great!)")
         except Exception as e:
-            print(f"Flash Attention not available: {e}")
-            print("Falling back to default SDPA attention")
+            print(f"⚠ Flash Attention not available: {e}")
+            print("  Falling back to default SDPA attention")
         
         # [Optional] Model Compilation
         # Compiling the DiT model accelerates inference, but the first run will take longer to compile.
