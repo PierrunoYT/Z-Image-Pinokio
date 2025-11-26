@@ -2,6 +2,7 @@ import torch
 import gradio as gr
 from PIL import Image
 import numpy as np
+from diffusers import ZImagePipeline
 
 # Global variable to store the pipeline
 pipe = None
@@ -12,15 +13,11 @@ def load_model():
     if pipe is None:
         print("Loading Z-Image-Turbo model...")
         
-        from diffusers import DiffusionPipeline
-        
-        # Load directly from Hugging Face Hub
-        # Z-Image-Turbo is available on HF with custom pipeline code
-        pipe = DiffusionPipeline.from_pretrained(
+        # Use bfloat16 for optimal performance on supported GPUs
+        pipe = ZImagePipeline.from_pretrained(
             "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
-            trust_remote_code=True,
-            use_safetensors=True,
+            low_cpu_mem_usage=False,
         )
         pipe.to("cuda")
         
