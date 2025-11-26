@@ -25,26 +25,25 @@ def load_model():
         print("This may take a few minutes on first launch...")
         print("=" * 60)
         
-        from huggingface_hub import snapshot_download, hf_hub_download
+        from modelscope import snapshot_download
         import importlib.util
         import sys
+        import os
         
-        # Download the custom pipeline file
-        print("Downloading custom pipeline code...")
-        pipeline_file = hf_hub_download(
-            repo_id="Tongyi-MAI/Z-Image-Turbo",
-            filename="pipeline_zimage.py",
-        )
-        
-        # Download model files
-        print("Downloading model files (this may take a while)...")
+        # Download model from ModelScope (includes custom pipeline)
+        print("Downloading model from ModelScope...")
         model_path = snapshot_download(
-            repo_id="Tongyi-MAI/Z-Image-Turbo",
-            ignore_patterns=["*.md", "*.txt"],
+            'Tongyi-MAI/Z-Image-Turbo',
+            revision='master',
         )
         
-        # Load the custom pipeline module
+        # Find and load the custom pipeline module
         print("Loading custom pipeline...")
+        pipeline_file = os.path.join(model_path, "pipeline_zimage.py")
+        
+        if not os.path.exists(pipeline_file):
+            raise FileNotFoundError(f"pipeline_zimage.py not found in {model_path}")
+        
         spec = importlib.util.spec_from_file_location("pipeline_zimage", pipeline_file)
         pipeline_module = importlib.util.module_from_spec(spec)
         sys.modules["pipeline_zimage"] = pipeline_module
