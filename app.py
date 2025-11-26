@@ -1,6 +1,6 @@
 import torch
 import gradio as gr
-from modelscope import ZImagePipeline
+from diffusers import DiffusionPipeline
 from PIL import Image
 import numpy as np
 
@@ -13,10 +13,11 @@ def load_model():
     if pipe is None:
         print("Loading Z-Image-Turbo model...")
         # Use bfloat16 for optimal performance on supported GPUs
-        pipe = ZImagePipeline.from_pretrained(
+        pipe = DiffusionPipeline.from_pretrained(
             "Tongyi-MAI/Z-Image-Turbo",
             torch_dtype=torch.bfloat16,
             low_cpu_mem_usage=False,
+            trust_remote_code=True,
         )
         pipe.to("cuda")
         
