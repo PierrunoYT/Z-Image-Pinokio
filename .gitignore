@@ -49,7 +49,6 @@ desktop.ini
 models/
 checkpoints/
 outputs/
-*.png
 *.jpg
 *.jpeg
 example.png
