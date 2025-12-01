@@ -13,7 +13,7 @@ from diffusers import ZImagePipeline
 pipe = None
 
 def load_model():
-    """Load the Z-Image-Turbo model"""
+    """Load the Z-Image-Turbo model with optimizations"""
     global pipe
     if pipe is None:
         print("=" * 60)
@@ -32,8 +32,51 @@ def load_model():
         )
         pipe.to("cuda")
         
+        # Performance Optimizations
+        print("Applying performance optimizations...")
+        
+        # 1. Try Flash Attention (if available)
+        try:
+            pipe.transformer.set_attention_backend("flash")
+            print("✓ Flash Attention 2 enabled")
+        except Exception as e:
+            try:
+                pipe.transformer.set_attention_backend("_flash_3")
+                print("✓ Flash Attention 3 enabled")
+            except Exception:
+                print("✓ Using default SDPA attention (Flash Attention not available)")
+        
+        # 2. Enable torch.compile for faster inference (first run will be slower)
+        try:
+            print("Compiling model (first run will take longer)...")
+            pipe.transformer = torch.compile(pipe.transformer, mode="max-autotune", fullgraph=True)
+            print("✓ Model compilation enabled")
+        except Exception as e:
+            print(f"✓ Model compilation skipped: {e}")
+        
+        # 3. Enable memory efficient attention
+        try:
+            pipe.enable_attention_slicing(1)
+            print("✓ Attention slicing enabled")
+        except Exception:
+            pass
+        
+        # 4. Enable VAE slicing for memory efficiency
+        try:
+            pipe.enable_vae_slicing()
+            print("✓ VAE slicing enabled")
+        except Exception:
+            pass
+        
+        # 5. Enable VAE tiling for large images
+        try:
+            pipe.enable_vae_tiling()
+            print("✓ VAE tiling enabled")
+        except Exception:
+            pass
+        
         print("=" * 60)
-        print("Model loaded successfully!")
+        print("Model loaded successfully with optimizations!")
         print("=" * 60)
         
     return pipe
