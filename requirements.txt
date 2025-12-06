@@ -1,6 +1,6 @@
 # Core dependencies
-gradio==4.44.1
-fastapi==0.115.5
+gradio
+fastapi>=0.115.5
 starlette>=0.40.0
 Pillow
 numpy<2.0.0
