@@ -1,7 +1,7 @@
 # Core dependencies
 torch>=2.0.0
 torchvision
-gradio>=6.0.0
+gradio>=6.0.0,<7.0.0
 Pillow
 numpy
 
