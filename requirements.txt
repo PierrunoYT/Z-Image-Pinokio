@@ -4,6 +4,7 @@ torchvision
 gradio>=6.0.0,<7.0.0
 Pillow
 numpy<2.0.0
+opencv-python-headless>=4.8.0,<4.9.0
 
 # ComfyUI dependencies (if not using existing ComfyUI installation)
 # These are needed if you're running ComfyUI nodes directly
