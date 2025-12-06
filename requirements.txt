@@ -3,7 +3,7 @@ torch>=2.0.0
 torchvision
 gradio>=6.0.0,<7.0.0
 Pillow
-numpy
+numpy<2.0.0
 
 # ComfyUI dependencies (if not using existing ComfyUI installation)
 # These are needed if you're running ComfyUI nodes directly
@@ -11,6 +11,7 @@ safetensors
 transformers
 accelerate
 git+https://github.com/huggingface/diffusers.git
+huggingface-hub>=0.34.0,<1.0
 omegaconf
 einops
 tqdm
