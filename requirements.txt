@@ -1,18 +1,19 @@
 # Core dependencies
-torch>=2.0.0
-torchvision
-gradio>=6.0.0,<7.0.0
+gradio==4.44.1
+fastapi==0.115.5
+starlette>=0.40.0
 Pillow
 numpy<2.0.0
 opencv-python-headless>=4.8.0,<4.9.0
 
-# ComfyUI dependencies (if not using existing ComfyUI installation)
-# These are needed if you're running ComfyUI nodes directly
-safetensors
-transformers
-accelerate
+# Diffusers and HuggingFace
 git+https://github.com/huggingface/diffusers.git
 huggingface-hub>=0.34.0,<1.0
+transformers
+safetensors
+accelerate
+
+# Additional dependencies
 omegaconf
 einops
 tqdm

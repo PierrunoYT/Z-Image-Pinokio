@@ -1,26 +1,6 @@
 module.exports = {
   run: [
-    // Install Z-Image-Turbo dependencies from requirements.txt
-    {
-      method: "shell.run",
-      params: {
-        venv: "env",
-        message: [
-          "pip install -r requirements.txt"
-        ],
-      }
-    },
-    // Install diffusers from source (required for ZImagePipeline)
-    {
-      method: "shell.run",
-      params: {
-        venv: "env",
-        message: [
-          "pip install git+https://github.com/huggingface/diffusers"
-        ],
-      }
-    },
-    // Install PyTorch with CUDA support and xformers
+    // Install PyTorch with CUDA support first
     {
       method: "script.start",
       params: {
@@ -29,6 +9,17 @@ module.exports = {
           venv: "env",
           xformers: true   // Enable xformers for memory-efficient attention
         }
+      }
+    },
+    // Install Z-Image-Turbo dependencies from requirements.txt
+    // This includes diffusers from source with ZImagePipeline support
+    {
+      method: "shell.run",
+      params: {
+        venv: "env",
+        message: [
+          "pip install -r requirements.txt"
+        ],
       }
     },
     // Pre-download Z-Image-Turbo model (~12GB)
