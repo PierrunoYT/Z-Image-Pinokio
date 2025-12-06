@@ -155,4 +155,11 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860, theme=gr.themes.Soft())
+    demo.queue()
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=7860,
+        share=False,
+        inbrowser=False,
+        show_error=True
+    )
