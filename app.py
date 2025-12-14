@@ -80,6 +80,15 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
                 lines=3,
             )
             
+            # Resolution presets
+            gr.Markdown("**Resolution Presets:**")
+            with gr.Row():
+                preset_512 = gr.Button("512×512", size="sm")
+                preset_768 = gr.Button("768×768", size="sm")
+                preset_1024 = gr.Button("1024×1024", size="sm")
+                preset_landscape = gr.Button("1024×768", size="sm")
+                preset_portrait = gr.Button("768×1024", size="sm")
+            
             with gr.Row():
                 width = gr.Slider(
                     label="Width",
@@ -160,6 +169,13 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
         ],
         outputs=[output_image, used_seed],
     )
+    
+    # Preset buttons event handlers
+    preset_512.click(fn=lambda: (512, 512), outputs=[width, height])
+    preset_768.click(fn=lambda: (768, 768), outputs=[width, height])
+    preset_1024.click(fn=lambda: (1024, 1024), outputs=[width, height])
+    preset_landscape.click(fn=lambda: (1024, 768), outputs=[width, height])
+    preset_portrait.click(fn=lambda: (768, 1024), outputs=[width, height])
 
 if __name__ == "__main__":
     demo.queue()
