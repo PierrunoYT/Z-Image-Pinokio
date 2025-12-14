@@ -1,5 +1,5 @@
 # Core dependencies
-gradio
+gradio==5.50.0
 fastapi>=0.115.5
 starlette>=0.40.0
 Pillow
