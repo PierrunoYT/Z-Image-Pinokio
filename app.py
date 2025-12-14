@@ -2,9 +2,17 @@ import torch
 import gradio as gr
 from diffusers import ZImagePipeline
 import random
+from datetime import datetime
+import uuid
+import os
 
 # Global pipeline variable
 pipe = None
+output_dir = "outputs"
+
+# Create outputs directory if it doesn't exist
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
 def load_pipeline():
     global pipe
@@ -44,7 +52,13 @@ def generate_image(
         generator=generator,
     ).images[0]
     
-    return image, seed
+    # Save with unique timestamp + UUID filename
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    unique_id = str(uuid.uuid4())[:8]
+    filename = os.path.join(output_dir, f"image_{timestamp}_{unique_id}.png")
+    image.save(filename)
+    
+    return filename, seed
 
 # Pre-load the pipeline on startup
 load_pipeline()
@@ -116,7 +130,7 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
         with gr.Column(scale=1):
             output_image = gr.Image(
                 label="Generated Image",
-                type="pil",
+                type="filepath",
                 format="png",
             )
             used_seed = gr.Number(label="Seed Used", interactive=False)
