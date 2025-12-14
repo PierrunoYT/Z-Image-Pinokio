@@ -46,6 +46,9 @@ def generate_image(
         generator=generator,
     ).images[0]
     
+    # Set format to PNG for better quality and compatibility
+    image.format = "PNG"
+    
     return image, seed
 
 # Pre-load the pipeline on startup
