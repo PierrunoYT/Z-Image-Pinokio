@@ -44,9 +44,6 @@ def generate_image(
         generator=generator,
     ).images[0]
     
-    # Set format to PNG for better quality and compatibility
-    image.format = "PNG"
-    
     return image, seed
 
 # Pre-load the pipeline on startup
@@ -120,6 +117,7 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
             output_image = gr.Image(
                 label="Generated Image",
                 type="pil",
+                format="png",
             )
             used_seed = gr.Number(label="Seed Used", interactive=False)
     
