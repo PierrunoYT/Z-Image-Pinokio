@@ -79,13 +79,16 @@ def generate_image(
             print(f"\n{'='*60}")
             print("ERROR: CUDA/GPU error during image generation")
             print(f"{'='*60}")
-            print(f"Error details: {error_msg}")
+            print(f"Technical details: {error_msg[:200]}...")  # Truncate long errors
             print("\nPossible solutions:")
             print("1. Reduce image resolution (try 768x768 or 512x512)")
             print("2. Close other GPU-intensive applications")
             print("3. Restart the application")
             print("4. Update NVIDIA drivers and reinstall the application")
             print(f"{'='*60}\n")
+            # Show user-friendly error in UI
+            user_msg = "GPU error occurred. Try reducing resolution or restarting the app. Check console for details."
+            raise gr.Error(user_msg)
         raise gr.Error(f"Image generation failed: {error_msg}")
 
 # Pre-load the pipeline on startup

@@ -10,6 +10,7 @@ module.exports = {
         "message": [
           "uv pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 {{args && args.xformers ? 'xformers==0.0.28.post3' : ''}} --index-url https://download.pytorch.org/whl/cu124 --force-reinstall --no-deps",
           "uv pip install triton-windows",
+          // Note: Using bdashore3's flash-attention build for Windows (unofficial but widely used)
           "uv pip install https://github.com/bdashore3/flash-attention/releases/download/v2.7.0.post2/flash_attn-2.7.0.post2%2Bcu124torch2.5.1cxx11abiFALSE-cp310-cp310-win_amd64.whl"
         ]
       }
@@ -54,6 +55,7 @@ module.exports = {
         "message": [
           "uv pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 {{args && args.xformers ? 'xformers==0.0.28.post3' : ''}} --index-url https://download.pytorch.org/whl/cu124 --force-reinstall",
           "uv pip install triton",
+          // Note: Using official Dao-AILab flash-attention build for Linux
           "uv pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.0.post2/flash_attn-2.7.0.post2%2Bcu124torch2.5.1cxx11abiFALSE-cp310-cp310-linux_x86_64.whl"
         ]
       }
