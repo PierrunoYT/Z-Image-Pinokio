@@ -70,7 +70,7 @@ python app.py
 - **GPU**: 12GB VRAM (NVIDIA RTX 30-series or newer with CUDA)
 - **RAM**: 16GB
 - **Storage**: ~15GB for model
-- **Driver**: NVIDIA Driver 535.x or newer (for CUDA 12.4 support)
+- **Driver**: NVIDIA Driver 545.x or newer (for CUDA 12.8 support)
 
 ### Recommended
 - **GPU**: 16GB+ VRAM (RTX 3090, 4090, etc.)
