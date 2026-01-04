@@ -18,13 +18,26 @@ def load_pipeline():
     global pipe
     if pipe is None:
         print("Loading Z-Image-Turbo pipeline...")
-        pipe = ZImagePipeline.from_pretrained(
-            "Tongyi-MAI/Z-Image-Turbo",
-            torch_dtype=torch.bfloat16,
-            low_cpu_mem_usage=False,
-        )
-        pipe.to("cuda")
-        print("Pipeline loaded successfully!")
+        try:
+            pipe = ZImagePipeline.from_pretrained(
+                "Tongyi-MAI/Z-Image-Turbo",
+                torch_dtype=torch.bfloat16,
+                low_cpu_mem_usage=False,
+            )
+            pipe.to("cuda")
+            print("Pipeline loaded successfully!")
+        except RuntimeError as e:
+            if "CUDA" in str(e):
+                print(f"\n{'='*60}")
+                print("ERROR: CUDA compatibility issue detected!")
+                print(f"{'='*60}")
+                print(f"Error details: {str(e)}")
+                print("\nPossible solutions:")
+                print("1. Update your NVIDIA driver to the latest version")
+                print("2. Reinstall the application to get compatible PyTorch version")
+                print("3. Check that your GPU is CUDA-compatible")
+                print(f"{'='*60}\n")
+            raise
     return pipe
 
 def generate_image(
@@ -36,29 +49,44 @@ def generate_image(
     seed,
     randomize_seed,
 ):
-    pipe = load_pipeline()
-    
-    if randomize_seed:
-        seed = random.randint(0, 2**32 - 1)
-    
-    generator = torch.Generator("cuda").manual_seed(seed)
-    
-    image = pipe(
-        prompt=prompt,
-        height=height,
-        width=width,
-        num_inference_steps=num_inference_steps,
-        guidance_scale=guidance_scale,
-        generator=generator,
-    ).images[0]
-    
-    # Save with unique timestamp + UUID filename
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    unique_id = str(uuid.uuid4())[:8]
-    filename = os.path.join(output_dir, f"image_{timestamp}_{unique_id}.png")
-    image.save(filename)
-    
-    return filename, seed
+    try:
+        pipe = load_pipeline()
+        
+        if randomize_seed:
+            seed = random.randint(0, 2**32 - 1)
+        
+        generator = torch.Generator("cuda").manual_seed(seed)
+        
+        image = pipe(
+            prompt=prompt,
+            height=height,
+            width=width,
+            num_inference_steps=num_inference_steps,
+            guidance_scale=guidance_scale,
+            generator=generator,
+        ).images[0]
+        
+        # Save with unique timestamp + UUID filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        unique_id = str(uuid.uuid4())[:8]
+        filename = os.path.join(output_dir, f"image_{timestamp}_{unique_id}.png")
+        image.save(filename)
+        
+        return filename, seed
+    except RuntimeError as e:
+        error_msg = str(e)
+        if "CUDA" in error_msg or "out of memory" in error_msg.lower():
+            print(f"\n{'='*60}")
+            print("ERROR: CUDA/GPU error during image generation")
+            print(f"{'='*60}")
+            print(f"Error details: {error_msg}")
+            print("\nPossible solutions:")
+            print("1. Reduce image resolution (try 768x768 or 512x512)")
+            print("2. Close other GPU-intensive applications")
+            print("3. Restart the application")
+            print("4. Update NVIDIA drivers and reinstall the application")
+            print(f"{'='*60}\n")
+        raise gr.Error(f"Image generation failed: {error_msg}")
 
 # Pre-load the pipeline on startup
 load_pipeline()

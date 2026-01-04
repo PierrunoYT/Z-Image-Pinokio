@@ -67,14 +67,35 @@ python app.py
 ## System Requirements
 
 ### Minimum
-- **GPU**: 12GB VRAM (NVIDIA with CUDA)
+- **GPU**: 12GB VRAM (NVIDIA RTX 30-series or newer with CUDA)
 - **RAM**: 16GB
 - **Storage**: ~15GB for model
+- **Driver**: NVIDIA Driver 535.x or newer (for CUDA 12.4 support)
 
 ### Recommended
 - **GPU**: 16GB+ VRAM (RTX 3090, 4090, etc.)
 - **RAM**: 32GB
 - **Storage**: SSD for faster loading
+
+### Supported GPUs
+- ✅ RTX 40-series (4090, 4080, 4070, etc.)
+- ✅ RTX 30-series (3090, 3080, 3070, 3060 12GB)
+- ✅ RTX 20-series (2080 Ti, 2080, 2070)
+- ✅ Tesla/Quadro series with 12GB+ VRAM
+
+## Troubleshooting
+
+### CUDA Errors
+If you encounter "CUDA error: no kernel image is available for execution on the device":
+1. **Update NVIDIA Driver**: Install the latest driver from [NVIDIA's website](https://www.nvidia.com/drivers)
+2. **Reinstall**: Click "Reset" then "Install" in Pinokio to reinstall with compatible PyTorch version
+3. **Verify GPU**: Run `nvidia-smi` to confirm your GPU is detected
+
+### Out of Memory Errors
+If you get CUDA out of memory errors:
+1. Close other GPU-intensive applications
+2. Reduce image resolution (try 768x768 or 512x512)
+3. Restart the application
 
 ## Model Info
 
