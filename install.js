@@ -18,7 +18,7 @@ module.exports = {
       params: {
         venv: "env",
         message: [
-          "pip install -r requirements.txt"
+          "uv pip install -r requirements.txt"
         ],
       }
     },

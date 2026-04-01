@@ -12,7 +12,7 @@ module.exports = {
         ],
         on: [{
           // Monitor for Gradio's HTTP URL output
-          "event": "/http:\\/\\/[^\\s\\/]+:\\d{2,5}(?=[^\\w]|$)/",
+          "event": "/(http:\\/\\/\\S+)/",
           "done": true
         }]
       }
@@ -21,7 +21,7 @@ module.exports = {
     {
       method: "local.set",
       params: {
-        url: "{{input.event[0]}}"
+        url: "{{input.event[1]}}"
       }
     },
     {
