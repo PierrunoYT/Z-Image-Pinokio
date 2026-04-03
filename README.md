@@ -35,18 +35,19 @@ python -m venv env
 source env/bin/activate  # Linux/Mac
 # or: env\Scripts\activate  # Windows
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (app code lives in ./app)
+pip install -r app/requirements.txt
 pip install git+https://github.com/huggingface/diffusers
 
 # Run the app
+cd app
 python app.py
 ```
 
 ## Usage
 
-1. **Start** the app via Pinokio or `python app.py`
-2. Open `http://localhost:7860` in your browser
+1. **Start** the app via Pinokio or run `python app.py` from the `app` folder
+2. Open the URL shown in the terminal (Pinokio sets `PORT` automatically; default is `http://127.0.0.1:7860`)
 3. Enter a prompt describing your image
 4. Adjust settings:
    - **Width/Height**: 512-2048px (default 1024x1024)

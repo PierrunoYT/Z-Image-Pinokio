@@ -1,23 +1,23 @@
 module.exports = {
   daemon: true,
   run: [
-    // Launch Z-Image-Turbo Gradio Web UI
     {
       method: "shell.run",
       params: {
         venv: "env",
-        env: { },
+        path: "app",
+        env: {
+          PORT: "{{port}}"
+        },
         message: [
           "python app.py"
         ],
         on: [{
-          // Monitor for Gradio's HTTP URL output
-          "event": "/(http:\\/\\/\\S+)/",
-          "done": true
+          event: "/(http:\\/\\/[0-9.:]+)/",
+          done: true
         }]
       }
     },
-    // Set the local URL variable for the "Open Web UI" button
     {
       method: "local.set",
       params: {
@@ -32,4 +32,3 @@ module.exports = {
     }
   ]
 }
-

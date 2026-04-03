@@ -1,4 +1,3 @@
-const path = require('path')
 module.exports = {
   version: "1.0.0",
   title: "Z-Image-Turbo",

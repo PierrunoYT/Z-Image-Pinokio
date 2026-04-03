@@ -1,35 +1,33 @@
 module.exports = {
   run: [
-    // Install PyTorch with CUDA support first
     {
       method: "script.start",
       params: {
         uri: "torch.js",
         params: {
           venv: "env",
-          xformers: true   // Enable xformers for memory-efficient attention
+          path: "app",
+          xformers: true
         }
       }
     },
-    // Install Z-Image-Turbo dependencies from requirements.txt
-    // This includes diffusers from source with ZImagePipeline support
     {
       method: "shell.run",
       params: {
         venv: "env",
+        path: "app",
         message: [
           "uv pip install -r requirements.txt"
         ],
       }
     },
-    // Pre-download Z-Image-Turbo model (~12GB)
-    // Using && dir to ensure clean prompt termination
     {
       method: "shell.run",
       params: {
         venv: "env",
+        path: "app",
         message: [
-          "huggingface-cli download Tongyi-MAI/Z-Image-Turbo --local-dir-use-symlinks False && dir"
+          "hf download Tongyi-MAI/Z-Image-Turbo"
         ],
       }
     },
