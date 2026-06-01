@@ -98,6 +98,75 @@ If you get CUDA out of memory errors:
 2. Reduce image resolution (try 768x768 or 512x512)
 3. Restart the application
 
+## API
+
+The app exposes a Gradio HTTP API once running. Replace `<PORT>` with the port shown in the terminal (default `7860`).
+
+### Generate an image
+
+**curl**
+```bash
+curl -X POST http://127.0.0.1:<PORT>/run/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [
+      "a majestic dragon at sunset",
+      1024,
+      1024,
+      9,
+      0.0,
+      42,
+      true
+    ]
+  }'
+```
+
+**Python**
+```python
+from gradio_client import Client
+
+client = Client("http://127.0.0.1:<PORT>")
+result = client.predict(
+    prompt="a majestic dragon at sunset",
+    width=1024,
+    height=1024,
+    num_inference_steps=9,
+    guidance_scale=0.0,
+    seed=42,
+    randomize_seed=True,
+    api_name="/predict",
+)
+print(result)  # (filepath, seed_used)
+```
+
+**JavaScript**
+```javascript
+const response = await fetch("http://127.0.0.1:<PORT>/run/predict", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    data: [
+      "a majestic dragon at sunset",  // prompt
+      1024,                            // width
+      1024,                            // height
+      9,                               // num_inference_steps
+      0.0,                             // guidance_scale
+      42,                              // seed
+      true,                            // randomize_seed
+    ],
+  }),
+});
+const { data } = await response.json();
+const [filePath, seedUsed] = data;
+console.log(filePath, seedUsed);
+```
+
+The response `data` array contains:
+| Index | Type | Description |
+|-------|------|-------------|
+| 0 | string | Path to the generated PNG file |
+| 1 | number | Seed that was actually used |
+
 ## Model Info
 
 - **Model**: [Tongyi-MAI/Z-Image-Turbo](https://huggingface.co/Tongyi-MAI/Z-Image-Turbo)

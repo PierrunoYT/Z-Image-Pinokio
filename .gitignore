@@ -51,6 +51,7 @@ checkpoints/
 outputs/
 *.jpg
 *.jpeg
+!icon.jpg
 example.png
 
 # Gradio

@@ -1,8 +1,5 @@
 module.exports = {
   version: "1.0.0",
-  title: "Z-Image-Turbo",
-  description: "⚡️ Efficient 6B parameter image generation model with sub-second inference. Generate high-quality, photorealistic images with only 8 inference steps. Features bilingual text rendering (Chinese & English) and Single-Stream Diffusion Transformer architecture.",
-  icon: "icon.jpg",
   menu: async (kernel, info) => {
     let installed = info.exists("app/env")
     let running = {

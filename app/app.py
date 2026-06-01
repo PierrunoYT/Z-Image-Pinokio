@@ -6,6 +6,17 @@ from datetime import datetime
 import uuid
 import os
 
+
+def get_device():
+    if torch.cuda.is_available():
+        return "cuda"
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
+DEVICE = get_device()
+
 # Global pipeline variable
 pipe = None
 output_dir = "outputs"
@@ -17,14 +28,14 @@ if not os.path.exists(output_dir):
 def load_pipeline():
     global pipe
     if pipe is None:
-        print("Loading Z-Image-Turbo pipeline...")
+        print(f"Loading Z-Image-Turbo pipeline on {DEVICE}...")
         try:
             pipe = ZImagePipeline.from_pretrained(
                 "Tongyi-MAI/Z-Image-Turbo",
                 torch_dtype=torch.bfloat16,
                 low_cpu_mem_usage=False,
             )
-            pipe.to("cuda")
+            pipe.to(DEVICE)
             print("Pipeline loaded successfully!")
         except RuntimeError as e:
             if "CUDA" in str(e):
@@ -55,7 +66,7 @@ def generate_image(
         if randomize_seed:
             seed = random.randint(0, 2**32 - 1)
         
-        generator = torch.Generator("cuda").manual_seed(seed)
+        generator = torch.Generator(DEVICE).manual_seed(seed)
         
         image = pipe(
             prompt=prompt,
@@ -75,9 +86,9 @@ def generate_image(
         return filename, seed
     except RuntimeError as e:
         error_msg = str(e)
-        if "CUDA" in error_msg or "out of memory" in error_msg.lower():
+        if any(k in error_msg for k in ("CUDA", "MPS", "out of memory")):
             print(f"\n{'='*60}")
-            print("ERROR: CUDA/GPU error during image generation")
+            print("ERROR: GPU error during image generation")
             print(f"{'='*60}")
             print(f"Technical details: {error_msg[:200]}...")  # Truncate long errors
             print("\nPossible solutions:")
