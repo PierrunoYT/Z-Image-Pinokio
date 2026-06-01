@@ -1,5 +1,5 @@
 module.exports = {
-  version: "1.0.0",
+  version: "5.0",
   menu: async (kernel, info) => {
     let installed = info.exists("app/env")
     let running = {
