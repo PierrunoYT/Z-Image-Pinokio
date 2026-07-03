@@ -22,8 +22,7 @@ pipe = None
 output_dir = "outputs"
 
 # Create outputs directory if it doesn't exist
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+os.makedirs(output_dir, exist_ok=True)
 
 def load_pipeline():
     global pipe
@@ -65,7 +64,9 @@ def generate_image(
         
         if randomize_seed:
             seed = random.randint(0, 2**32 - 1)
-        
+        else:
+            seed = int(seed)
+
         generator = torch.Generator(DEVICE).manual_seed(seed)
         
         image = pipe(
@@ -101,6 +102,10 @@ def generate_image(
             user_msg = "GPU error occurred. Try reducing resolution or restarting the app. Check console for details."
             raise gr.Error(user_msg)
         raise gr.Error(f"Image generation failed: {error_msg}")
+    except gr.Error:
+        raise
+    except Exception as e:
+        raise gr.Error(f"Image generation failed: {str(e)}")
 
 # Pre-load the pipeline on startup
 load_pipeline()
