@@ -11,6 +11,7 @@ diffusers==0.38.0
 # Last release before v1. Keeps transformers on 4.x, which is the branch
 # Z-Image-Turbo's Qwen3 text encoder was authored against.
 huggingface_hub==0.36.2
+hf_xet
 transformers
 safetensors
 accelerate
