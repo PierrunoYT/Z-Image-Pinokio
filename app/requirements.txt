@@ -8,7 +8,7 @@ opencv-python-headless>=4.8.0,<4.9.0
 
 # Diffusers and HuggingFace
 git+https://github.com/huggingface/diffusers.git
-huggingface-hub>=0.34.0,<1.0
+huggingface-hub>=0.34.0
 transformers
 safetensors
 accelerate
@@ -22,5 +22,5 @@ kornia
 spandrel
 soundfile
 
-# Optional for better performance
-xformers; platform_system != "Darwin"
+# NOTE: torch/torchvision/torchaudio/xformers are installed by torch.js,
+# which pins them to the correct CUDA/ROCm build for the host GPU.
