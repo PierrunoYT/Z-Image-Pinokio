@@ -215,6 +215,8 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
     
     generate_btn.click(
         fn=generate_image,
+        api_name="predict",
+        concurrency_limit=1,
         inputs=[
             prompt,
             width,

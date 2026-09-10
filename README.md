@@ -125,13 +125,16 @@ If you get CUDA out of memory errors:
 
 ## API
 
-The app exposes a Gradio HTTP API once running. Replace `<PORT>` with the port shown in the terminal (default `7860`).
+The app exposes the named Gradio endpoint `/predict` once running. Replace `<PORT>` with the port shown in the terminal (default `7860`). Requests are queued one at a time, sharing the loaded pipeline with the UI. The first request also includes model loading time.
 
 ### Generate an image
 
 **curl**
+
+Submit a job (Bash syntax; in PowerShell use `curl.exe` and its shell's quoting):
+
 ```bash
-curl -X POST http://127.0.0.1:<PORT>/run/predict \
+curl -X POST "http://127.0.0.1:<PORT>/gradio_api/call/predict" \
   -H "Content-Type: application/json" \
   -d '{
     "data": [
@@ -141,12 +144,26 @@ curl -X POST http://127.0.0.1:<PORT>/run/predict \
       9,
       0.0,
       42,
-      true
+      false
     ]
   }'
 ```
 
+The POST returns `{"event_id":"..."}`, not the image. Copy that ID into the
+following request and keep the connection open until `event: complete`:
+
+```bash
+curl -N "http://127.0.0.1:<PORT>/gradio_api/call/predict/<EVENT_ID>"
+```
+
+The completion event's `data:` line is a JSON array containing the image file
+object and the seed. Use the file object's `url` to download the PNG. An
+`event: error` indicates that generation failed.
+
 **Python**
+
+Install `gradio_client` in the calling environment with `pip install gradio_client`.
+
 ```python
 from gradio_client import Client
 
@@ -158,39 +175,44 @@ result = client.predict(
     num_inference_steps=9,
     guidance_scale=0.0,
     seed=42,
-    randomize_seed=True,
+    randomize_seed=False,
     api_name="/predict",
 )
 print(result)  # (filepath, seed_used)
 ```
 
 **JavaScript**
+
+Install `@gradio/client` with `npm install @gradio/client` and run this as an ES module
+(for example, `generate.mjs`). The client handles the queue and result stream.
+
 ```javascript
-const response = await fetch("http://127.0.0.1:<PORT>/run/predict", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    data: [
-      "a majestic dragon at sunset",  // prompt
-      1024,                            // width
-      1024,                            // height
-      9,                               // num_inference_steps
-      0.0,                             // guidance_scale
-      42,                              // seed
-      true,                            // randomize_seed
-    ],
-  }),
-});
-const { data } = await response.json();
-const [filePath, seedUsed] = data;
-console.log(filePath, seedUsed);
+import { Client } from "@gradio/client";
+
+const client = await Client.connect("http://127.0.0.1:<PORT>");
+const result = await client.predict("/predict", [
+  "a majestic dragon at sunset", // prompt
+  1024,                          // width
+  1024,                          // height
+  9,                             // num_inference_steps
+  0.0,                           // guidance_scale
+  42,                            // seed
+  false,                         // randomize_seed
+]);
+const [image, seedUsed] = result.data;
+console.log(image.url, seedUsed);
 ```
 
-The response `data` array contains:
+The HTTP completion event and JavaScript client's `data` array contain:
+
 | Index | Type | Description |
 |-------|------|-------------|
-| 0 | string | Path to the generated PNG file |
+| 0 | object | Gradio file metadata, including `url` and server-side `path` |
 | 1 | number | Seed that was actually used |
+
+The Python client downloads the image and returns `(local_filepath, seed_used)`.
+The examples use seed 42; set `randomize_seed` to `true` (`True` in Python) to
+choose a random seed instead. See the [Gradio client guide](https://huggingface.co/docs/hub/spaces-api-endpoints).
 
 ## Model Info
 

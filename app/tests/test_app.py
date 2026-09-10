@@ -31,6 +31,23 @@ class AppTests(unittest.TestCase):
         self.factory.assert_not_called()
         self.gradio.Blocks.assert_called_once()
 
+    def test_predict_endpoint_uses_generation_handler_and_serial_queue(self):
+        events = self.gradio.Button.return_value.click.call_args_list
+        event = next(c.kwargs for c in events if c.kwargs.get("api_name") == "predict")
+        self.assertIs(event["fn"], self.app["generate_image"])
+        self.assertEqual(event["concurrency_limit"], 1)
+        self.assertEqual(len(event["inputs"]), 7)
+        self.assertEqual(len(event["outputs"]), 2)
+
+    def test_generation_returns_saved_image_and_manual_seed(self):
+        filename, seed = self.app["generate_image"]("a dragon", 512, 768, 9, 0.0, 42.0, False)
+        self.assertEqual(seed, 42)
+        self.assertIsInstance(seed, int)
+        self.torch.Generator.return_value.manual_seed.assert_called_once_with(42)
+        self.pipeline.return_value.images[0].save.assert_called_once_with(filename)
+        self.assertEqual(self.pipeline.call_args.kwargs["prompt"], "a dragon")
+        self.assertEqual(self.pipeline.call_args.kwargs["height"], 768)
+
     def test_default_offload_never_moves_entire_pipeline_to_gpu(self):
         load = self.app["load_pipeline"]
         self.assertIs(load(), self.pipeline)
