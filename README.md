@@ -100,6 +100,10 @@ out of memory. See the [Diffusers memory guide](https://huggingface.co/docs/diff
 - **Storage**: SSD for faster loading
 
 ### Supported GPUs
+- **Windows AMD**: CPU fallback only. DirectML acceleration is not implemented;
+  the installer uses the CPU PyTorch build. CPU inference uses float32 and needs
+  substantially more RAM than half-precision GPU inference. Generation can be very slow.
+- **Linux AMD**: Uses the ROCm installation branch; requires a ROCm-compatible GPU and system.
 - ✅ RTX 40-series (4090, 4080, 4070, etc.)
 - ✅ RTX 30-series (3090, 3080, 3070, 3060 12GB)
 - ✅ RTX 20-series (2080 Ti, 2080, 2070)

@@ -34,7 +34,7 @@ def load_pipeline():
                 raise ValueError("Z_IMAGE_OFFLOAD must be sequential, model, or none")
             candidate = ZImagePipeline.from_pretrained(
                 "Tongyi-MAI/Z-Image-Turbo",
-                torch_dtype=torch.bfloat16,
+                torch_dtype=torch.float32 if DEVICE == "cpu" else torch.bfloat16,
                 low_cpu_mem_usage=True,
             )
             # Install offload hooks while weights are still on the CPU.
@@ -126,6 +126,8 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
         Generate high-quality images using the Z-Image-Turbo model from Tongyi-MAI.
         """
     )
+    if DEVICE == "cpu":
+        gr.Markdown("**Running on CPU.** Generation can be very slow. Windows AMD GPU acceleration is not supported.")
     
     with gr.Row():
         with gr.Column(scale=1):

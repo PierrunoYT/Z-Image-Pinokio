@@ -61,6 +61,18 @@ class AppTests(unittest.TestCase):
             self.app["load_pipeline"]()
         self.factory.assert_not_called()
 
+    def test_cpu_fallback_uses_float32_without_gpu_offloading(self):
+        self.torch.cuda.is_available.return_value = False
+        self.torch.backends.mps.is_available.return_value = False
+        self.assertEqual(self.app["get_device"](), "cpu")
+        load = self.app["load_pipeline"]
+        load.__globals__["DEVICE"] = "cpu"
+        load()
+        self.assertIs(self.factory.call_args.kwargs["torch_dtype"], self.torch.float32)
+        self.pipeline.to.assert_called_once_with("cpu")
+        self.pipeline.enable_sequential_cpu_offload.assert_not_called()
+        self.pipeline.enable_model_cpu_offload.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
