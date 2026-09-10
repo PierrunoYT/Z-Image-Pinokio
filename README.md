@@ -56,6 +56,27 @@ python app.py
    - **Seed**: Set specific seed or randomize
 5. Click **Generate**
 
+The UI opens before the model is loaded. The first generation loads the model;
+later requests reuse it. A failed load is reported in the UI and can be retried.
+
+### Memory modes
+
+CUDA/ROCm uses sequential CPU offloading by default, transferring model layers
+to the GPU only when needed. This reduces VRAM use but makes generation slower
+and requires enough system RAM to hold the model.
+
+Set `Z_IMAGE_OFFLOAD` in the launch environment before starting the app:
+
+| Value | Behavior |
+|-------|----------|
+| `sequential` (default) | Lowest VRAM use; slowest generation |
+| `model` | Faster; each complete model component must fit in VRAM |
+| `none` | Fastest; the entire pipeline and generation buffers must fit in VRAM |
+
+CPU and MPS runs do not use these CUDA offload modes. Offloading does not
+guarantee that every resolution will fit; reduce dimensions if generation runs
+out of memory. See the [Diffusers memory guide](https://huggingface.co/docs/diffusers/optimization/memory).
+
 ## Settings Guide
 
 | Setting | Default | Description |
@@ -68,8 +89,8 @@ python app.py
 ## System Requirements
 
 ### Minimum
-- **GPU**: 12GB VRAM (NVIDIA RTX 30-series or newer with CUDA)
-- **RAM**: 16GB
+- **GPU**: 12GB VRAM target with sequential CPU offloading (NVIDIA RTX 30-series or newer with CUDA); actual requirements depend on resolution
+- **RAM**: 32GB recommended for CPU offloading; 16GB is not a guaranteed minimum
 - **Storage**: ~15GB for model
 - **Driver**: NVIDIA Driver 545.x or newer (for CUDA 12.8 support)
 

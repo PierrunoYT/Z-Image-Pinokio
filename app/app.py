@@ -29,12 +29,23 @@ def load_pipeline():
     if pipe is None:
         print(f"Loading Z-Image-Turbo pipeline on {DEVICE}...")
         try:
-            pipe = ZImagePipeline.from_pretrained(
+            offload = os.environ.get("Z_IMAGE_OFFLOAD", "sequential").lower()
+            if offload not in {"sequential", "model", "none"}:
+                raise ValueError("Z_IMAGE_OFFLOAD must be sequential, model, or none")
+            candidate = ZImagePipeline.from_pretrained(
                 "Tongyi-MAI/Z-Image-Turbo",
                 torch_dtype=torch.bfloat16,
-                low_cpu_mem_usage=False,
+                low_cpu_mem_usage=True,
             )
-            pipe.to(DEVICE)
+            # Install offload hooks while weights are still on the CPU.
+            if DEVICE == "cuda" and offload == "sequential":
+                candidate.enable_sequential_cpu_offload(device=DEVICE)
+            elif DEVICE == "cuda" and offload == "model":
+                candidate.enable_model_cpu_offload(device=DEVICE)
+            else:
+                candidate.to(DEVICE)
+            # A failed transfer must not leave a partially loaded global pipeline.
+            pipe = candidate
             print("Pipeline loaded successfully!")
         except RuntimeError as e:
             if "CUDA" in str(e):
@@ -106,9 +117,6 @@ def generate_image(
         raise
     except Exception as e:
         raise gr.Error(f"Image generation failed: {str(e)}")
-
-# Pre-load the pipeline on startup
-load_pipeline()
 
 # Create Gradio interface
 with gr.Blocks(title="Z-Image-Turbo") as demo:
