@@ -18,8 +18,8 @@ A Gradio web interface for the Z-Image-Turbo model, designed for easy installati
 2. Search for "Z-Image-Turbo" or add this repository URL
 3. Click **Install** - Pinokio will:
    - Create a Python virtual environment
-   - Install PyTorch with CUDA support
-   - Install diffusers from source (required for ZImagePipeline)
+   - Install PyTorch for your GPU (CUDA, ROCm, MPS, or CPU)
+   - Install the pinned Python dependencies, including diffusers
    - Download the Z-Image-Turbo model (~12GB)
 4. Click **Start** to launch the web UI
 
@@ -36,8 +36,8 @@ source env/bin/activate  # Linux/Mac
 # or: env\Scripts\activate  # Windows
 
 # Install dependencies (app code lives in ./app)
+pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu128  # NVIDIA; see torch.js for other platforms
 pip install -r app/requirements.txt
-pip install git+https://github.com/huggingface/diffusers
 
 # Run the app
 cd app

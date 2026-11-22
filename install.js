@@ -30,7 +30,7 @@ module.exports = {
         venv: "env",
         path: "app",
         message: [
-          "hf download Tongyi-MAI/Z-Image-Turbo && dir"
+          "hf download Tongyi-MAI/Z-Image-Turbo && echo download-complete"
         ],
       }
     },

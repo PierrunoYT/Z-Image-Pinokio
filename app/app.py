@@ -5,6 +5,7 @@ import random
 from datetime import datetime
 import uuid
 import os
+import platform
 
 
 def get_device():
@@ -16,6 +17,17 @@ def get_device():
 
 
 DEVICE = get_device()
+
+
+def get_dtype():
+    if DEVICE == "cpu":
+        return torch.float32
+    if DEVICE == "mps":
+        # bfloat16 on MPS requires macOS 14+; older releases fall back to float32.
+        release = platform.mac_ver()[0]
+        major = int(release.split(".")[0]) if release else 0
+        return torch.bfloat16 if major >= 14 else torch.float32
+    return torch.bfloat16
 
 # Global pipeline variable
 pipe = None
@@ -34,7 +46,7 @@ def load_pipeline():
                 raise ValueError("Z_IMAGE_OFFLOAD must be sequential, model, or none")
             candidate = ZImagePipeline.from_pretrained(
                 "Tongyi-MAI/Z-Image-Turbo",
-                torch_dtype=torch.float32 if DEVICE == "cpu" else torch.bfloat16,
+                torch_dtype=get_dtype(),
                 low_cpu_mem_usage=True,
             )
             # Install offload hooks while weights are still on the CPU.
@@ -76,6 +88,8 @@ def generate_image(
         if randomize_seed:
             seed = random.randint(0, 2**32 - 1)
         else:
+            if seed is None:
+                raise gr.Error("Enter a seed or enable Randomize Seed.")
             seed = int(seed)
 
         generator = torch.Generator(DEVICE).manual_seed(seed)
@@ -127,7 +141,7 @@ with gr.Blocks(title="Z-Image-Turbo") as demo:
         """
     )
     if DEVICE == "cpu":
-        gr.Markdown("**Running on CPU.** Generation can be very slow. Windows AMD GPU acceleration is not supported.")
+        gr.Markdown("**Running on CPU.** No supported GPU was detected; generation can be very slow.")
     
     with gr.Row():
         with gr.Column(scale=1):
