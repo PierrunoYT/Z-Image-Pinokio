@@ -83,6 +83,8 @@ def generate_image(
     randomize_seed,
 ):
     try:
+        if not prompt or not prompt.strip():
+            raise gr.Error("Enter a prompt.")
         pipe = load_pipeline()
         
         if randomize_seed:
@@ -96,10 +98,10 @@ def generate_image(
         
         image = pipe(
             prompt=prompt,
-            height=height,
-            width=width,
-            num_inference_steps=num_inference_steps,
-            guidance_scale=guidance_scale,
+            height=int(height),
+            width=int(width),
+            num_inference_steps=int(num_inference_steps),
+            guidance_scale=float(guidance_scale),
             generator=generator,
         ).images[0]
         

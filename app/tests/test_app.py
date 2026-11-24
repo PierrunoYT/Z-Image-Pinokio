@@ -48,6 +48,18 @@ class AppTests(unittest.TestCase):
         self.assertEqual(self.pipeline.call_args.kwargs["prompt"], "a dragon")
         self.assertEqual(self.pipeline.call_args.kwargs["height"], 768)
 
+    def test_blank_prompt_is_rejected_before_model_load(self):
+        with self.assertRaises(self.gradio.Error):
+            self.app["generate_image"]("   ", 512, 512, 9, 0.0, 1, False)
+        self.factory.assert_not_called()
+
+    def test_api_float_inputs_are_coerced_to_ints(self):
+        self.app["generate_image"]("x", 512.0, 768.0, 9.0, 0, 1, False)
+        kwargs = self.pipeline.call_args.kwargs
+        self.assertEqual((kwargs["width"], kwargs["height"]), (512, 768))
+        self.assertIsInstance(kwargs["height"], int)
+        self.assertIsInstance(kwargs["num_inference_steps"], int)
+
     def test_default_offload_never_moves_entire_pipeline_to_gpu(self):
         load = self.app["load_pipeline"]
         self.assertIs(load(), self.pipeline)
